@@ -14,7 +14,7 @@ const CONFIG = {
 
   googleSheets: {
     habilitado: true,
-    url: 'https://script.google.com/macros/s/AKfycbwPRb8m5jIRL7R-UvOet-QLpkgXghXXnHvpvdMUosDKbr0oakndWH44vVVDCP2pka1Q/exec',
+    url: 'https://script.google.com/macros/s/AKfycbyjY_3tsHjS1XzGfiT3Da6S8bCVIAw7ndcYudwv6kqNSycG0t9VI3iYRhQ29SHnaFFV/exec,
     intervaloAtualizacao: 10000
   },
 
