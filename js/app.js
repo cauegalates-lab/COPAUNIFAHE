@@ -188,6 +188,26 @@ function obterDashboardNormalizado(data) {
   return null;
 }
 
+
+function obterValorFaturado(item = {}) {
+  return pegarNumero(
+    item.realizado ??
+    item.valor_faturado ??
+    item.valorFaturado ??
+    item.valor_realizado ??
+    item.valorRealizado ??
+    item.total_faturado ??
+    item.totalFaturado ??
+    item.valor_total ??
+    item.valorTotal ??
+    item.total_vendido ??
+    item.totalVendido ??
+    item.faturamento ??
+    item.valor ??
+    0
+  );
+}
+
 function normalizarDashboardBaias(baiasFonte) {
   const baias = CONFIG.baias.map(baiaConfig => {
     const origens = (baiasFonte || []).filter(item => compararBaia(
@@ -198,19 +218,7 @@ function normalizarDashboardBaias(baiasFonte) {
     const origem = origens.reduce((acc, item) => {
       // Faturado em R$ deve vir de valor_faturado/valorFaturado.
       // O campo pontos fica separado e NÃO entra no faturado.
-      acc.realizado += pegarNumero(
-        item.valor_faturado ??
-        item.valorFaturado ??
-        item.valor_faturado_total ??
-        item.valorFaturadoTotal ??
-        item.realizado ??
-        item.faturado ??
-        item.totalFaturado ??
-        item.valorTotal ??
-        item.totalVendido ??
-        item.valor ??
-        0
-      );
+      acc.realizado += obterValorFaturado(item);
 
       acc.boletos += pegarInteiro(
         item.boletos ??
@@ -252,7 +260,7 @@ function normalizarDashboardBaias(baiasFonte) {
             nome: nomeMembro,
             gols: item.gols ?? item.gol ?? item.pontos ?? 0,
             pontos: item.pontos ?? item.gols ?? item.gol ?? 0,
-            realizado: item.valor_faturado ?? item.valorFaturado ?? item.realizado ?? item.faturado ?? 0,
+            realizado: obterValorFaturado(item),
             boletos: item.boletos ?? item.boleto ?? 0,
             vendasConfirmadas: item.vendasConfirmadas ?? item.quantidade ?? item.qtd ?? item.vendas ?? 0
           });
@@ -288,7 +296,7 @@ function calcularDashboardPorVendas(vendas) {
     if (!baia) return;
 
     const atual = acumulado[baia.id];
-    const valorVenda = Math.max(0, pegarNumero(registro.valor_faturado ?? registro.valorFaturado ?? registro.valorTotal ?? registro.valor ?? registro.realizado ?? registro.total ?? registro.venda ?? 0));
+    const valorVenda = Math.max(0, obterValorFaturado(registro));
     const boletosVenda = contarBoletos(registro.boletos ?? registro.boleto ?? registro.temBoleto ?? registro.pagamento);
     const qtdVenda = pegarInteiro(registro.quantidade ?? registro.qtd ?? 1) || 1;
 
@@ -329,7 +337,7 @@ function montarBaiaVisual(baiaConfig, dados = {}) {
       ...membro,
       baiaId: baiaConfig.id,
       foto: membro.foto || CONFIG.assets.placeholderFoto,
-      realizado: pegarNumero(origem.valor_faturado ?? origem.valorFaturado ?? origem.realizado ?? origem.faturado ?? origem.total ?? membro.valor_faturado ?? membro.valorFaturado ?? membro.realizado ?? membro.faturado ?? 0),
+      realizado: obterValorFaturado(origem) || obterValorFaturado(membro),
       boletos: pegarInteiro(origem.boletos ?? origem.boleto ?? membro.boletos ?? membro.boleto ?? 0),
       vendasConfirmadas: pegarInteiro(origem.vendasConfirmadas ?? origem.quantidade ?? origem.qtd ?? origem.vendas ?? membro.vendasConfirmadas ?? membro.quantidade ?? membro.qtd ?? membro.vendas ?? 0),
       situacao: 'vivo'
